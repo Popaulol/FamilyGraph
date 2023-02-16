@@ -6,7 +6,8 @@ allowing multiple lines
 
 Or should all 3 work?
 
-config config
+This shall not load this nonexistend config
+config configus
 
 */
 
