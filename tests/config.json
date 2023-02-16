@@ -1,0 +1,16 @@
+{
+    "->": {
+        "title": "Blub",
+        "color": "green",
+        "raw_attributes": "",
+        "inference": "None",
+        "directed": true
+    },
+    "<>": {
+        "title": "bla",
+        "color": "yellow",
+        "raw_attributes": "",
+        "inference": "None",
+        "directed": false
+    }
+}

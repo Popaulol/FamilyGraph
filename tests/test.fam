@@ -1,0 +1,39 @@
+# Should a comment look like this
+// Or like this
+/*
+Or maybe even like this
+allowing multiple lines
+
+Or should all 3 work?
+
+config config
+
+*/
+
+include test2
+blubbus the blubbest <> blibbo blabten
+
+blub -> blib
+blab -> blib
+blub <> blab
+{
+  name: The bl?b fam
+  blub
+  blab
+  blib
+}
+
+config config
+
+blib <-> foo
+blib <-> bar
+foo <-> bar
+blib <> baz
+baz <-> bar
+
+{
+  name: The friend group
+  blib
+  foo
+  bar
+}
