@@ -11,20 +11,20 @@ config configus
 
 */
 
-include test2
+include tests/test2
 blubbus the blubbest <> blibbo blabten
 
 blub -> blib
 blab -> blib
 blub <> blab
 {
-  name: The bl?b fam
+  name: The bl b fam
   blub
   blab
   blib
 }
 
-config config
+config tests/config
 
 blib <-> foo
 blib <-> bar
@@ -38,3 +38,15 @@ baz <-> bar
   foo
   bar
 }
+
+people tests/blubos
+
+config tests/inference_test
+
+frank --> gertrude
+frank --> paul
+paul --> ron
+paul --> obf
+frank --> unix
+
+frank --> grrrrrrrrrrrrrrrrr

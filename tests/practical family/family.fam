@@ -1,0 +1,80 @@
+config connections
+people people
+
+hans <> maria
+
+maria -> hans_juergen
+hans -> hans_juergen
+maria -> manfred
+hans -> manfred
+maria -> dorothee
+hans -> dorothee
+maria -> werner
+hans -> werner
+
+hans_juergen </> babara2
+hans_juergen <> jutta
+
+babara2 -> mathis
+hans_juergen -> mathis
+babara2 -> katja
+hans_juergen -> katja
+jutta -> jana
+hans_juergen -> jana
+jutta -> lukas
+hans_juergen -> lukas
+
+manfred <> monika
+
+monika -> emily
+manfred -> emily
+monika -> annkathrin
+manfred -> annkathrin
+
+dorothee <> unknown1
+
+unknown1 -> Christian
+dorothee -> Christian
+
+werner <> eva
+
+eva -> paul
+werner -> paul
+
+
+karin </> erko
+erko <> helga
+helga </> unknown2
+
+helga -> holger
+unknown2 -> holger
+
+holger <> alexandra
+
+alexandra -> max
+holger -> max
+
+karin -> eva
+erko -> eva
+karin -> antje
+erko -> antje
+karin -> barbara
+erko -> barbara
+karin -> carl
+erko -> carl
+
+antje <> udo
+
+antje -> jonas
+udo -> jonas
+antje -> ina
+udo -> ina
+
+jonas <> janina
+
+barbara <> ralf
+
+barbara -> marius
+ralf -> marius
+barbara -> lara
+ralf -> lara

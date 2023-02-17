@@ -1,0 +1,27 @@
+{
+  "<>" : {
+    "color" : "red",
+    "directed": false,
+    "inference": null
+  },
+  "</>" : {
+    "color" : "black",
+    "style": "dotted",
+    "directed": false,
+    "inference": null
+  },
+  "->" : {
+    "color": "blue",
+    "directed": true,
+    "inference": null
+  },
+  "--" : {
+    "inference": {
+          "type": "sib",
+          "parent_connection": "->"
+        },
+        "directed": false,
+    "color": "pink",
+    "style": "dashed"
+  }
+}

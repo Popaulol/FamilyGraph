@@ -1,0 +1,15 @@
+{
+  "-->": {
+        "inference": null,
+        "directed": false
+    },
+  "---" :{
+        "inference": {
+          "type": "sib",
+          "parent_connection": "-->"
+        },
+        "directed": false,
+    "color": "pink",
+    "title": "YESSSS!"
+    }
+}

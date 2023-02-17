@@ -3,14 +3,13 @@
         "title": "Blub",
         "color": "green",
         "raw_attributes": "",
-        "inference": "None",
+        "inference": null,
         "directed": true
     },
     "<>": {
-        "title": "adsassadasdsda",
-        "color": "green",
-        "raw_attributes": "",
-        "inference": "None",
-        "directed": true
+        "title": "ad",
+        "color": "red",
+        "inference": null,
+        "directed": false
     }
 }

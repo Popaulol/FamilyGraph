@@ -1,0 +1,10 @@
+{
+  "blub" : {
+    "name": "Blub",
+    "color": "Blue"
+  },
+  "blab" : {
+     "name": "Blab",
+    "color": "Green"
+  }
+}
