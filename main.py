@@ -4,6 +4,7 @@ import builtins
 import enum
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -95,6 +96,8 @@ class Person:
     outgoing: list[Connection] = field(default_factory=list)
     dot_id: str = field(default_factory=generate_uuid)
     color: Optional[str] = None
+    background_color: Optional[str] = None
+    text_color: Optional[str] = None
 
 
 @dataclass
@@ -125,6 +128,8 @@ def add_people(path: str):
         person = people.get(fam_id, Person(fam_id))
         person.name = data.get("name", person.name)
         person.color = data.get("color", person.color)
+        person.background_color = data.get("background-color", person.background_color)
+        person.text_color = data.get("text-color", person.text_color)
         people[fam_id] = person
 
 
@@ -142,7 +147,7 @@ def parse(name: str):
         content = f.read()
 
     comment_depth = 0
-    for row, line in enumerate(content.split("\n"), 1):
+    for row, line in enumerate(re.split("\n|;", content), 1):
         line = line.strip()
         if comment_depth >= 1:
             if line.startswith("/*"):
@@ -266,15 +271,18 @@ def fixup_connections():
 
 
 def generate_dot_file(name: str):
+    print(name)
+    newline = "\n"
     with open(name, "w") as f:
         f.write("digraph Tree {\n")
 
         for person in people.values():
-            f.write(f"""{person.dot_id} [
-            color="{person.color}"
-            label="{person.name or person.fam_id}"
-            ]
-        """)
+            color = f'color="{person.color}"' if person.color else ""
+            label = f'label="{person.name or person.fam_id}"'
+            bg_color = f'fillcolor="{person.background_color}"' if person.background_color else ""
+            txt_color = f'fontcolor="{person.text_color}"' if person.text_color else ""
+            f.write(f"""{person.dot_id} [{newline.join(attr for attr in (color, label, bg_color, txt_color, 
+                                                                         "style=filled") if attr)}]\n""")
 
         for connection in connections:
             """
@@ -338,7 +346,7 @@ def main() -> None:
         "--no-dot", help="Do not run Graphviz on the generated dot-file", action="store_false"
     )
     parser.add_argument("--format", help="The output format", default="svg")
-    parser.add_argument("--layout", help="The dot Layout Engine to use", default="circo")
+    parser.add_argument("--layout", help="The dot Layout Engine to use", default="dot")
     parser.add_argument("--silent", help="Should we just stay fully silent?", action="store_true")
     parser.add_argument("-v", "--verbose", help="Should we print various debugging output? Repeat this option more often, to get more Output.", action="count", default=0)
     args = parser.parse_args()

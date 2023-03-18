@@ -1,7 +1,9 @@
 {
   "blub" : {
     "name": "Blub",
-    "color": "Blue"
+    "color": "Blue",
+    "background-color": "Black",
+    "text-color": "Gray"
   },
   "blab" : {
      "name": "Blab",
