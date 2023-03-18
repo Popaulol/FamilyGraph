@@ -1,14 +1,37 @@
 from __future__ import annotations
 import argparse
+import builtins
 import enum
 import json
+import os
 import subprocess
+from pathlib import Path
 from typing import Optional
 from pprint import pprint
 
 from dataclasses import dataclass, field
 
 count = 0
+
+silent = False
+verbosity = 0
+
+
+def silent_print(*args, **kwargs):
+    if silent:
+        return
+
+    return builtins.print(*args, **kwargs)
+
+
+def verbosity_print(*args, level, **kwargs):
+    if silent:
+        return
+
+    if verbosity < level:
+        return
+
+    return builtins.print(*args, **kwargs)
 
 
 def generate_uuid():
@@ -108,7 +131,14 @@ def add_people(path: str):
 def parse(name: str):
     in_group = False
     current_group = None
-    with open(name, "r") as f:
+
+    file = Path(name).resolve(strict=True)
+    cwd = os.getcwd()
+    os.chdir(file.parent)
+
+    assert file.is_file(), "You need to Pass a file, not a directory."
+
+    with open(file, "r") as f:
         content = f.read()
 
     comment_depth = 0
@@ -147,15 +177,15 @@ def parse(name: str):
             pass
         elif line.startswith("include "):
             parse(line[8:].replace('"', "") + ".fam")
-            print(line)
+            verbosity_print(f"Parsing include:\t`{line}`", level=2)
             continue
         elif line.startswith("config "):
             add_connection_types(line[7:].replace('"', "") + ".json")
-            print(line)
+            verbosity_print(f"Parsing config:\t`{line}`", level=2)
             continue
         elif line.startswith("people "):
             add_people(line[7:].replace('"', "") + ".json")
-            print(line)
+            verbosity_print(f"Parsing people Statement:\t`{line}`", level=2)
             continue
         elif line.startswith("{"):
             in_group = True
@@ -177,9 +207,10 @@ def parse(name: str):
             first_person = " ".join(first_person)
             second_person = " ".join(line.split(" ")[index + 1:])
 
-            print(
-                f"First Person: `{first_person}` Op: `{operator}` Second Person: `{second_person}`"
-            )
+            verbosity_print(
+                f"Parsing Connection: First Person: `{first_person}` Op: `{operator}` Second Person: `{second_person}`",
+                level=3)
+
             first_person_object = people.get(first_person, Person(first_person))
             second_person_object = people.get(second_person, Person(second_person))
             conn = Connection(operator, first_person_object, second_person_object)
@@ -187,6 +218,8 @@ def parse(name: str):
             second_person_object.incoming.append(conn)
             people[first_person] = first_person_object
             people[second_person] = second_person_object
+
+    os.chdir(cwd)
 
 
 def fixup_connections():
@@ -219,16 +252,17 @@ def fixup_connections():
             if conn.target is connection.target and conn.origin is connection.origin and conn is not connection:
                 deleted.add(conn)
 
-    print(len(connections))
+    verbosity_print(f"Count of Connections before deletion {len(connections)}", level=1)
     for connection in deleted:
         try:
             connections.remove(connection)
             connection.target.incoming.remove(connection)
             connection.origin.outgoing.remove(connection)
         except Exception as e:
-            print(e)
-    print(len(connections))
-    print(len(deleted))
+            verbosity_print(f"Exception Occured during Connection deletion, this is could be expected but might be a "
+                            f"bug {e}", level=1)
+    verbosity_print(f"Count of Connections after deletion {len(connections)}", level=1)
+    verbosity_print(f"Count of Connections deletiod {len(deleted)}", level=1)
 
 
 def generate_dot_file(name: str):
@@ -300,8 +334,18 @@ def main() -> None:
     parser.add_argument(
         "--infer", help="Should we try to infer things?", action="store_true"
     )
+    parser.add_argument(
+        "--no-dot", help="Do not run Graphviz on the generated dot-file", action="store_false"
+    )
     parser.add_argument("--format", help="The output format", default="svg")
+    parser.add_argument("--layout", help="The dot Layout Engine to use", default="circo")
+    parser.add_argument("--silent", help="Should we just stay fully silent?", action="store_true")
+    parser.add_argument("-v", "--verbose", help="Should we print various debugging output? Repeat this option more often, to get more Output.", action="count", default=0)
     args = parser.parse_args()
+
+    global silent, verbosity
+    silent = args.silent
+    verbosity = args.verbose
 
     parse(args.file)
     fixup_connections()
@@ -312,7 +356,10 @@ def main() -> None:
         fixup_connections()
     generate_dot_file(args.file + ".dot")
 
-    subprocess.call(["dot", "-Tsvg", "-O", args.file + ".dot"])
+    if args.no_dot:
+        command = ["dot", f"-T{args.format}", f"-K{args.layout}", "-O", args.file + ".dot"]
+        silent_print(f"Calling dot: `{' '.join(command)}`")
+        subprocess.call(command)
 
 
 if __name__ == "__main__":

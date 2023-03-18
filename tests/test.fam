@@ -11,7 +11,7 @@ config configus
 
 */
 
-include tests/test2
+include test2
 blubbus the blubbest <> blibbo blabten
 
 blub -> blib
@@ -24,7 +24,7 @@ blub <> blab
   blib
 }
 
-config tests/config
+config config
 
 blib <-> foo
 blib <-> bar
@@ -39,9 +39,9 @@ baz <-> bar
   bar
 }
 
-people tests/blubos
+people blubos
 
-config tests/inference_test
+config inference_test
 
 frank --> gertrude
 frank --> paul
