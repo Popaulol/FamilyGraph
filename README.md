@@ -104,5 +104,8 @@ And they consist of a single High level Object, mapping the names/ids used for t
 
 All of these Attributes can just be left out, then the default value will be used.
 
+## Examples
+Multiple examples can be found it the `./tests/` directory.
+
 ## Handling of conflicts
 When there are conflicting Options, the last one defined is the one that is used.
