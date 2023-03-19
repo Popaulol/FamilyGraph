@@ -7,6 +7,7 @@
   },
   "blab" : {
      "name": "Blab",
-    "color": "Green"
+    "color": "white",
+    "image": "./blub1.png"
   }
 }

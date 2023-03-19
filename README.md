@@ -92,7 +92,8 @@ They describe various Attributes of the Nodes/People in your graph:
   },
   "blab" : {
      "name": "Blab",
-    "color": "Green"
+    "color": "Green",
+    "image": "./blub.png"
   }
 }
 ```
@@ -101,6 +102,7 @@ And they consist of a single High level Object, mapping the names/ids used for t
 - `color: ` This is the outline color the Person will have on the final Graph. This can be any string accepted by graphviz's [color Attribute](https://graphviz.org/docs/attrs/color/)
 - `background-color: ` The Background color of the Node
 - `text-color: ` The Text Colour of the Node
+- `Image: ` The reletive Path to an image to use instead of the Node
 
 All of these Attributes can just be left out, then the default value will be used.
 

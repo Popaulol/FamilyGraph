@@ -98,6 +98,7 @@ class Person:
     color: Optional[str] = None
     background_color: Optional[str] = None
     text_color: Optional[str] = None
+    image: Optional[str] = None
 
 
 @dataclass
@@ -130,6 +131,7 @@ def add_people(path: str):
         person.color = data.get("color", person.color)
         person.background_color = data.get("background-color", person.background_color)
         person.text_color = data.get("text-color", person.text_color)
+        person.image = data.get("image", person.image)
         people[fam_id] = person
 
 
@@ -281,7 +283,9 @@ def generate_dot_file(name: str):
             label = f'label="{person.name or person.fam_id}"'
             bg_color = f'fillcolor="{person.background_color}"' if person.background_color else ""
             txt_color = f'fontcolor="{person.text_color}"' if person.text_color else ""
-            f.write(f"""{person.dot_id} [{newline.join(attr for attr in (color, label, bg_color, txt_color, 
+            image = f'''image="{person.image}"
+                            imagescale=both''' if person.image else ""
+            f.write(f"""{person.dot_id} [{newline.join(attr for attr in (color, label, bg_color, txt_color, image,
                                                                          "style=filled") if attr)}]\n""")
 
         for connection in connections:
@@ -345,7 +349,7 @@ def main() -> None:
     parser.add_argument(
         "--no-dot", help="Do not run Graphviz on the generated dot-file", action="store_false"
     )
-    parser.add_argument("--format", help="The output format", default="svg")
+    parser.add_argument("--format", help="The output format", default="png")
     parser.add_argument("--layout", help="The dot Layout Engine to use", default="dot")
     parser.add_argument("--silent", help="Should we just stay fully silent?", action="store_true")
     parser.add_argument("-v", "--verbose", help="Should we print various debugging output? Repeat this option more often, to get more Output.", action="count", default=0)
@@ -365,7 +369,10 @@ def main() -> None:
     generate_dot_file(args.file + ".dot")
 
     if args.no_dot:
-        command = ["dot", f"-T{args.format}", f"-K{args.layout}", "-O", args.file + ".dot"]
+        path = Path(args.file + ".dot").resolve()
+        os.chdir(path.parent)
+
+        command = ["dot", f"-T{args.format}", f"-K{args.layout}", "-O", str(path)]
         silent_print(f"Calling dot: `{' '.join(command)}`")
         subprocess.call(command)
 
