@@ -106,6 +106,19 @@ class Group:
     name: Optional[str] = None
     members: list[Person] = field(default_factory=list)
     dot_id: str = field(default_factory=generate_uuid)
+    parent: Optional[Group] = None
+    children: list[Group] = field(default_factory=list)
+
+    def generate(self, f):
+        newline = "\n"
+        f.write(f"""subgraph cluster_{generate_uuid()} {{ 
+                        {newline.join(map(lambda p: p.dot_id, self.members))}
+                        label="{self.name}"
+                """)
+        for group in self.children:
+            group.generate(f)
+
+        f.write("}")
 
 
 connection_types = {}
@@ -122,7 +135,7 @@ def add_connection_types(path: str):
 
 def add_people(path: str):
     # TODO: Add more Person attributes
-    with open(path, "r") as f:
+    with open(path, "r", encoding="UTF-8") as f:
         peeps = json.load(f)
 
     for fam_id, data in peeps.items():
@@ -136,7 +149,6 @@ def add_people(path: str):
 
 
 def parse(name: str):
-    in_group = False
     current_group = None
 
     file = Path(name).resolve(strict=True)
@@ -145,7 +157,7 @@ def parse(name: str):
 
     assert file.is_file(), "You need to Pass a file, not a directory."
 
-    with open(file, "r") as f:
+    with open(file, "r", encoding="UTF-8") as f:
         content = f.read()
 
     comment_depth = 0
@@ -163,15 +175,19 @@ def parse(name: str):
         elif line.startswith("/*"):
             comment_depth += 1
             continue
-        elif in_group:
+        elif current_group:
             if line.startswith("}"):
-                in_group = False
-                groups.append(current_group)
+                if not current_group.parent:
+                    groups.append(current_group)
+                else:
+                    current_group.parent.children.append(current_group)
+                current_group = current_group.parent
                 continue
             elif line.startswith("{"):
-                exit(
-                    f"Keine Gruppen in Gruppen: `{name}`:{row} -> `{line}`"
-                )
+                group = Group()
+                group.parent = current_group
+                current_group = group
+                continue
             elif ":" in line:
                 attribute, *rest = line.split(":")
                 rest = ":".join(rest)
@@ -195,7 +211,6 @@ def parse(name: str):
             verbosity_print(f"Parsing people Statement:\t`{line}`", level=2)
             continue
         elif line.startswith("{"):
-            in_group = True
             current_group = Group()
         elif line == "":
             continue
@@ -275,7 +290,7 @@ def fixup_connections():
 def generate_dot_file(name: str):
     print(name)
     newline = "\n"
-    with open(name, "w") as f:
+    with open(name, "w", encoding="UTF-8") as f:
         f.write("digraph Tree {\n")
 
         for person in people.values():
@@ -313,11 +328,7 @@ def generate_dot_file(name: str):
 
         newline = "\n"
         for group in groups:
-            f.write(f"""subgraph cluster_{generate_uuid()} {{
-                {newline.join(map(lambda p: p.dot_id, group.members))}
-                label="{group.name}"
-            }}
-        """)
+            group.generate(f)
         f.write("}")
 
 
@@ -352,7 +363,8 @@ def main() -> None:
     parser.add_argument("--format", help="The output format", default="png")
     parser.add_argument("--layout", help="The dot Layout Engine to use", default="dot")
     parser.add_argument("--silent", help="Should we just stay fully silent?", action="store_true")
-    parser.add_argument("-v", "--verbose", help="Should we print various debugging output? Repeat this option more often, to get more Output.", action="count", default=0)
+    parser.add_argument("-v", "--verbose", help="Should we print various debugging output? Repeat this option more "
+                                                "often, to get more Output.", action="count", default=0)
     args = parser.parse_args()
 
     global silent, verbosity
